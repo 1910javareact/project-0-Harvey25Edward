@@ -68,7 +68,7 @@ export async function daoPostReimbersement(post:Reimbursement) {
     try {
         client = await connectionPool.connect();
         client.query('BEGIN');
-        await client.query('INSERT INTO project0_reimbursement.reimbursement (author, amount, date_submitted, date_resolved, description, resolver, status_id, type_id) values ($1,$2,$3,$4,$5,null,1,$6)',
+        await client.query('INSERT INTO project0_reimbursement.reimbursement (author, amount, date_submitted, date_resolved, description, resolver, status, type) values ($1,$2,$3,$4,$5,null,1,$6)',
         [post.author, post.amount, Date.now() / 1000, 0, post.description, post.type]);
         const result = await client.query('SELECT * FROM project0_reimbursement.reimbursement WHERE author = $1 ORDER BY reimbursement_id DESC LIMIT 1 OFFSET 0',
         [post.author]);
@@ -76,6 +76,7 @@ export async function daoPostReimbersement(post:Reimbursement) {
         return reimbursementDTOtoReimbursement(result.rows);
     } catch (e) {
         client.query('ROLLBACK');
+        console.log(e)
         throw{
             status: 500,
             message: 'Internal Server Error'
@@ -119,10 +120,10 @@ export async function daoUpdateReimbursement(reimbursementUpdate: Reimbursement)
     let client: PoolClient
     try{
         client = await connectionPool.connect()
-        await client.query('UPDATE project_0.reimbursement SET date_resolved = $1, resolver = $2, status_id = $3 WHERE reimbursement_id = $4',
+        await client.query('UPDATE project0_reimbursement.reimbursement SET date_resolved = $1, resolver = $2, status = $3 WHERE reimbursement_id = $4',
         [Date.now() / 1000 , reimbursementUpdate.resolver, reimbursementUpdate.status, reimbursementUpdate.reimbursementId]);
         return await daoGetReimbursementByReimbursementId(reimbursementUpdate.reimbursementId)
-    }catch(e){
+    }catch(e){console.log(e)
         if(e === 'Reimbursement Does Not Exist'){
             throw{
                 status: 404,

@@ -119,7 +119,8 @@
   },
   "scripts": {
     "start": "nodemon --exec ts-node src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy":"ts-node src/index.ts"
   },
   "repository": {
     "type": "git",
